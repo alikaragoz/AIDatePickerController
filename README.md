@@ -29,7 +29,7 @@ AIDatePickerController *datePickerViewController = [AIDatePickerController picke
 - ARC
 
 ##Credits
-Inspired by **roland.moers**'s [RMDateSelectionViewController](https://github.com/CooperRS/RMDateSelectionViewController).
+Inspired by **Roland Moers**'s [RMDateSelectionViewController](https://github.com/CooperRS/RMDateSelectionViewController).
 
 ## Contact
 
