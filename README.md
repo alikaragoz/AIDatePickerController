@@ -1,6 +1,5 @@
 AIDatePickerController
 --------------------
-UIDatePicker modally presented with iOS 7 custom transitions. Does not support rotation yet.
 
 <p align="center"><img src="github-assets/aidatepickercontroller.gif"/></p>
 

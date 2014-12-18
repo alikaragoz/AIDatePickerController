@@ -18,6 +18,7 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
 @property (nonatomic) UIView *buttonDivierView;
 @property (nonatomic) UIView *buttonContainerView;
 @property (nonatomic) UIView *datePickerContainerView;
+@property (nonatomic) UIView *dimmedView;
 
 // UIButton Actions
 - (void)didTouchCancelButton:(id)sender;
@@ -29,9 +30,22 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
 
 #pragma mark - Init
 
++ (id)pickerWithDate:(NSDate *)date selectedBlock:(AIDatePickerDateBlock)selectedBlock cancelBlock:(AIDatePickerVoidBlock)cancelBlock {
+    
+    if (![date isKindOfClass:NSDate.class]) {
+        date = [NSDate date];
+    }
+    
+    AIDatePickerController *datePickerController = [AIDatePickerController new];
+    datePickerController.datePicker.date = date;
+    datePickerController.dateBlock = [selectedBlock copy];
+    datePickerController.voidBlock = [cancelBlock copy];
+    return datePickerController;
+}
+
 - (id)init {
     self = [super init];
-    if (self == nil) {
+    if (!self) {
         return nil;
     }
     
@@ -48,17 +62,8 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
     return self;
 }
 
-+ (id)pickerWithDate:(NSDate *)date selectedBlock:(AIDatePickerDateBlock)selectedBlock cancelBlock:(AIDatePickerVoidBlock)cancelBlock {
+- (void)dealloc {
     
-    if (![date isKindOfClass:NSDate.class]) {
-        date = [NSDate date];
-    }
-    
-    AIDatePickerController *datePickerController = [AIDatePickerController new];
-    datePickerController.datePicker.date = date;
-    datePickerController.dateBlock = [selectedBlock copy];
-    datePickerController.voidBlock = [cancelBlock copy];
-    return datePickerController;
 }
 
 #pragma mark - UIViewController
@@ -178,16 +183,14 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-    UIView * containerView = [transitionContext containerView];
-    UIView *dimmedView = [self dimmedView];
+    UIView *containerView = [transitionContext containerView];
     
     // If we are presenting
     if (toViewController.view == self.view) {
         fromViewController.view.userInteractionEnabled = NO;
         
         // Adding the view in the right order
-        [containerView addSubview:fromViewController.view];
-        [containerView addSubview:dimmedView];
+        [containerView addSubview:self.dimmedView];
         [containerView addSubview:toViewController.view];
         
         // Moving the view OUT
@@ -195,11 +198,11 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
         frame.origin.y = CGRectGetHeight(toViewController.view.bounds);
         toViewController.view.frame = frame;
         
-        dimmedView.alpha = 0.0;
+        self.dimmedView.alpha = 0.0;
         
         [UIView animateWithDuration:AIAnimatedTransitionDuration delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
-
-            dimmedView.alpha = 0.5;
+            
+            self.dimmedView.alpha = 0.5;
             
             // Moving the view IN
             CGRect frame = toViewController.view.frame;
@@ -207,7 +210,7 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
             toViewController.view.frame = frame;
             
         } completion:^(BOOL finished) {
-            [transitionContext completeTransition:finished];
+            [transitionContext completeTransition:!transitionContext.transitionWasCancelled];
         }];
     }
     
@@ -215,15 +218,8 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
     else {
         toViewController.view.userInteractionEnabled = YES;
         
-        // Adding the view in the right order
-        [containerView addSubview:toViewController.view];
-        [containerView addSubview:dimmedView];
-        [containerView addSubview:fromViewController.view];
-        
-        dimmedView.alpha = 0.5;
-        
         [UIView animateWithDuration:AIAnimatedTransitionDuration delay:0.1 usingSpringWithDamping:1.0 initialSpringVelocity:0.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            dimmedView.alpha = 0.0;
+            self.dimmedView.alpha = 0.0;
             
             // Moving the view OUT
             CGRect frame = fromViewController.view.frame;
@@ -231,7 +227,7 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
             fromViewController.view.frame = frame;
             
         } completion:^(BOOL finished) {
-            [transitionContext completeTransition:finished];
+            [transitionContext completeTransition:!transitionContext.transitionWasCancelled];
         }];
     }
 }
@@ -252,11 +248,15 @@ static NSTimeInterval const AIAnimatedTransitionDuration = 0.4;
 #pragma mark - Factory Methods
 
 - (UIView *)dimmedView {
-    UIView *dimmedView = [[UIView alloc] initWithFrame:self.view.bounds];
-    dimmedView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-    dimmedView.tintAdjustmentMode = UIViewTintAdjustmentModeDimmed;
-    dimmedView.backgroundColor = [UIColor blackColor];
-    return dimmedView;
+    if (!_dimmedView) {
+        UIView *dimmedView = [[UIView alloc] initWithFrame:self.view.bounds];
+        dimmedView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        dimmedView.tintAdjustmentMode = UIViewTintAdjustmentModeDimmed;
+        dimmedView.backgroundColor = [UIColor blackColor];
+        _dimmedView = dimmedView;
+    }
+    
+    return _dimmedView;
 }
 
 @end
