@@ -3,6 +3,12 @@ AIDatePickerController
 
 <p align="center"><img src="github-assets/aidatepickercontroller.gif"/></p>
 
+## Installation
+
+#### Manually
+1. Download and drop ```/AIDatePickerController```folder in your project.  
+2. Congratulations!  
+
 ##Usage
 
 ```objc
