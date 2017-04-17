@@ -9,7 +9,7 @@ AIDatePickerController
 1. Download and drop ```/AIDatePickerController```folder in your project.  
 2. Congratulations!  
 
-##Usage
+## Usage
 
 ```objc
 // Create a date
@@ -29,11 +29,11 @@ AIDatePickerController *datePickerViewController = [AIDatePickerController picke
 [self presentViewController:datePickerViewController animated:YES completion:nil];
 ```
 
-##Requirements
+## Requirements
 - iOS >= 7.0
 - ARC
 
-##Credits
+## Credits
 Inspired by **Roland Moers**'s [RMDateSelectionViewController](https://github.com/CooperRS/RMDateSelectionViewController).
 
 ## Contact
